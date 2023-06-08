@@ -9,8 +9,7 @@ class ScrapingService:
         self.scraper = scraper if scraper else G2CrowdScrapper()
 
     async def scrape_companies_from_urls(self, urls: list[str]) -> list[CompanyDetails]:
-        tasks = [self.scraper.scrape(url) for url in urls]
-        scraped_data = await asyncio.gather(*tasks)
+        scraped_data = await self.get_scraped_data(urls)
 
         results = []
         for data in scraped_data:
@@ -22,3 +21,10 @@ class ScrapingService:
                 print(f"Unknown data type: {data}")
 
         return results
+
+    async def get_scraped_data(self, urls: list[str]):
+        tasks = [self.scraper.scrape(url) for url in urls]
+        scraped_data = await asyncio.gather(*tasks)
+        return scraped_data
+
+
