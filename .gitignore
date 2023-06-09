@@ -1,5 +1,32 @@
-.idea/
-.idea
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
 
-output/
-*.pyc
+# C extensions
+*.so
+
+# Distribution / packaging
+dist/
+build/
+*.egg-info/
+*.egg
+
+# Virtual environments
+venv/
+env/
+ENV/
+
+# IDEs and editors
+.idea/
+.vscode/
+*.sublime-*
+*.swp
+
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Ignore local configuration files
+*.conf.local
