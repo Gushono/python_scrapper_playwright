@@ -70,3 +70,10 @@ The app is built using FastAPI, which provides a web-based user interface to int
 
 ## Documentation
 1. You can access the documentation of the API by going to http://localhost:8000/docs.
+
+## Possible Improvements
+#### 1. Queueing and Separating Processing: Currently, the scraping process runs in a single execution flow, where URLs are scraped one after another. To improve efficiency and scalability, you can consider implementing a queue-based system. This approach involves pushing URLs into a queue and having separate worker processes or threads to consume URLs from the queue and perform scraping asynchronously. This can help parallelize the scraping process and handle a large number of URLs more efficiently.
+
+#### 2. Error Handling and Retry Mechanism: Enhance the error handling mechanism to handle exceptions gracefully during the scraping process. Implement a retry mechanism for failed requests or intermittent errors to increase the chances of successful scraping. You can also implement logging to capture and analyze errors for debugging and monitoring purposes.
+
+#### 3. Unit Tests and Test Coverage: Enhance the test suite by adding more unit tests to cover different scenarios and edge cases. Ensure sufficient test coverage to validate the functionality of the scraping service and its components. This can help catch bugs and regressions early in the development process.
