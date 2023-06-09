@@ -11,24 +11,6 @@ class ScraperBase(ABC):
         pass
 
     @staticmethod
-    async def scrape_table_data(page: Page):
-        try:
-            table_data = await page.evaluate('''() => {
-                       const table = document.querySelector('table');
-                       const rows = Array.from(table.rows);
-
-                       return rows.map(row => {
-                           const cells = Array.from(row.cells);
-                           return cells.map(cell => cell.innerText);
-                       });
-                   }''')
-
-            return table_data
-        except Exception as ex:
-            print(ex)
-            return None
-
-    @staticmethod
     async def scrape_description(page):
         try:
             description_element = await page.query_selector('meta[name="description"]')
@@ -57,7 +39,7 @@ class G2CrowdScrapper(ScraperBase):
         async with async_playwright() as playwright:
             uuid = random.randint(1, 1000)
 
-            browser = await playwright.chromium.launch()
+            browser = await playwright.chromium.launch(timeout=80000)
             page = await browser.new_page()
 
             await page.goto(url)
@@ -66,7 +48,6 @@ class G2CrowdScrapper(ScraperBase):
             title = await page.title()
             description = await self.scrape_description(page)
             links = await self.scrape_links(page)
-            table_data = await self.scrape_table_data(page)
             path_to_screenshot = f"{uuid}.png"
             await page.screenshot(path=f"output/{path_to_screenshot}")
 
@@ -77,6 +58,6 @@ class G2CrowdScrapper(ScraperBase):
                 description=description,
                 url=url,
                 links=links,
-                table_data=table_data,
+                table_data=[],
                 path_to_screenshot=path_to_screenshot
             )
