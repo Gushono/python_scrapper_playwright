@@ -3,12 +3,12 @@ from abc import ABC
 
 from playwright.async_api import async_playwright, Page
 
-from dtos import CompanyDetails
+from src.dtos.dtos import CompanyDetails
 
 
 class ScraperBase(ABC):
     async def scrape(self, url):
-        raise NotImplementedError
+        pass
 
     @staticmethod
     async def scrape_table_data(page: Page):
@@ -56,6 +56,7 @@ class G2CrowdScrapper(ScraperBase):
     async def scrape(self, url: str) -> CompanyDetails:
         async with async_playwright() as playwright:
             uuid = random.randint(1, 1000)
+
             browser = await playwright.chromium.launch()
             page = await browser.new_page()
 

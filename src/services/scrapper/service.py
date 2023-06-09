@@ -1,7 +1,7 @@
 import asyncio
 
-from dtos import CompanyDetails
-from scrapper.scrappers import ScraperBase, G2CrowdScrapper
+from src.dtos.dtos import CompanyDetails
+from src.services.scrapper.scrappers import ScraperBase, G2CrowdScrapper
 
 
 class ScrapingService:
