@@ -1,12 +1,12 @@
 import asyncio
 
 from src.dtos.dtos import CompanyDetails
-from src.services.scrapper.scrappers import ScraperBase, G2CrowdScrapper
+from src.services.scrapper.scrappers import ScraperBase, G2CrowdScraper
 
 
 class ScrapingService:
     def __init__(self, scraper: ScraperBase):
-        self.scraper = scraper if scraper else G2CrowdScrapper()
+        self.scraper = scraper if scraper else G2CrowdScraper()
 
     async def scrape_companies_from_urls(self, urls: list[str]) -> list[CompanyDetails]:
         scraped_data = await self.get_scraped_data(urls)
