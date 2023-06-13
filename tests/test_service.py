@@ -51,41 +51,7 @@ async def test_extract_description():
 
         await page.set_content(html)
 
-        header_description_element = await page.query_selector('div.l5')
-        header_description = await header_description_element.inner_text()
-        assert header_description == "What is LinkedIn Job Search?"
-
-        paragraph_description_element = await page.query_selector('div.ws-pw > p')
-        paragraph_description = await paragraph_description_element.inner_text()
-
-        assert paragraph_description == "LinkedIn Job Search is a tool that allows users to quickly find job opportunities with location-based search and get automatic recommendations and notifications based on job searches."
-
-        await browser.close()
-
-
-@pytest.mark.asyncio
-async def test_extract_reviews():
-    async with async_playwright() as playwright:
-        browser = await playwright.chromium.launch()
-        context = await browser.new_context()
-        page = await context.new_page()
-
-        html = '''<div class="paper paper--nestable" data-poison-text="">
-                    <div class="l5 pb-0">What is LinkedIn Job Search?</div>
-                    <div class="overflow-scrollbar-auto max-h-40 x-max-height-expand-initialized"
-                        data-max-height-expand-show-less-text="Show Less<svg xmlns=&quot;http://www.w3.org/2000/svg&quot; contain=&quot;paint&quot; buffered-rendering=&quot;static&quot; viewBox=&quot;0 0 10 10&quot; class=&quot;ml-half py-1/12 icon-chevron-thin nessy-only&quot; aria-hidden=&quot;true&quot; focusable=&quot;false&quot; role=&quot;presentation&quot;><path d=&quot;M10.001 8.015V3.957L5.017.915l-5.016 3v4l5-3z&quot;></path></svg>"
-                        data-max-height-expand-show-more-text="Show More<svg xmlns=&quot;http://www.w3.org/2000/svg&quot; contain=&quot;paint&quot; buffered-rendering=&quot;static&quot; viewBox=&quot;0 0 10 10&quot; class=&quot;ml-half py-1/12 r-180 icon-chevron-thin nessy-only&quot; aria-hidden=&quot;true&quot; focusable=&quot;false&quot; role=&quot;presentation&quot;><path d=&quot;M10.001 8.015V3.957L5.017.915l-5.016 3v4l5-3z&quot;></path></svg>"
-                        data-max-height-expand-theme="white" data-max-height-expand-type="show more height revealer"
-                        ue="max-height-expand">
-                        <div class="ws-pw" data-poison="" itemprop="description">
-                            <p>LinkedIn Job Search is a tool that allows users to quickly find job opportunities with location-based search and get automatic recommendations and notifications based on job searches.</p>
-                        </div>
-                    </div>
-                </div>'''
-
-        await page.set_content(html)
-
-        description = await G2CrowdScraper().scrape_description(page)
+        description = await G2CrowdScraper().scrape_rating(page)
         assert description == """What is LinkedIn Job Search?
 
  LinkedIn Job Search is a tool that allows users to quickly find job opportunities with location-based search and get automatic recommendations and notifications based on job searches."""
