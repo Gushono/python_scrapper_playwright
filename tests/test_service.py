@@ -51,7 +51,7 @@ async def test_extract_description():
 
         await page.set_content(html)
 
-        description = await G2CrowdScraper().scrape_rating(page)
+        description = await G2CrowdScraper().scrape_description(page)
         assert description == """What is LinkedIn Job Search?
 
  LinkedIn Job Search is a tool that allows users to quickly find job opportunities with location-based search and get automatic recommendations and notifications based on job searches."""
