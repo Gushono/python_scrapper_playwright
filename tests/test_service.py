@@ -54,7 +54,7 @@ async def test_extract_description():
         description = await G2CrowdScraper().scrape_description(page)
         assert description == """What is LinkedIn Job Search?
 
- LinkedIn Job Search is a tool that allows users to quickly find job opportunities with location-based search and get automatic recommendations and notifications based on job searches."""
+LinkedIn Job Search is a tool that allows users to quickly find job opportunities with location-based search and get automatic recommendations and notifications based on job searches."""
         await browser.close()
 
 
@@ -96,7 +96,7 @@ async def test_rating_extraction():
 
         star_ratings = await G2CrowdScraper().scrape_rating(page)
 
-        assert star_ratings == '917 LinkedIn Job Search Reviews \n\n (4.5) out of 5 stars'
+        assert star_ratings == '917 LinkedIn Job Search Reviews\n\n(4.5) out of 5 stars'
 
         await browser.close()
 
