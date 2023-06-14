@@ -29,7 +29,7 @@ class ScraperBase(ABC):
             paragraph_description_element = await page.query_selector('div.ws-pw > p')
             paragraph_description = await paragraph_description_element.inner_text()
 
-            return f"{header_description}\n\n {paragraph_description}"
+            return f"{header_description}\n\n{paragraph_description}"
 
         except Exception as ex:
             print(ex)
@@ -44,7 +44,7 @@ class ScraperBase(ABC):
             rating_element = await page.query_selector('.fw-semibold')
             rating_stars = await rating_element.text_content()
 
-            return f"{review_count_text} \n\n ({rating_stars.rstrip()}) out of 5 stars"
+            return f"{review_count_text}\n\n({rating_stars.rstrip()}) out of 5 stars"
         except Exception as ex:
             print(ex)
             return ""
@@ -55,10 +55,10 @@ class ScraperBase(ABC):
             progress_elements = await page.query_selector_all('.progress-meter.progress-meter--branding-rorange')
             star_ratings: list[CompanyPercentageStarReviews] = []
 
-            for i, element in enumerate(progress_elements[0: 5]):
+            for i, element in enumerate(progress_elements[:5]):
                 style_value = await element.get_attribute('style')
-                width_value = style_value.split(':')[1].strip(';').rstrip().lstrip()
-                star_text = str(5 - i) + ' star'
+                width_value = style_value.split(':')[1].strip(';').strip()
+                star_text = f"{5 - i} star"
                 star_ratings.append(CompanyPercentageStarReviews(
                     star=star_text,
                     percentage=width_value
@@ -80,45 +80,35 @@ class ScraperBase(ABC):
             return ""
 
     @staticmethod
-    async def scrape_obtain_reviews(page: Page) -> list[str]:
-        try:
-            div_element = await page.query_selector('div.f-1')
-            div_content = await div_element.inner_text()
+    async def scroll_page_randomly(page):
+        scroll_position = await page.evaluate('window.pageYOffset')
+        random_scroll_position = random.randint(0, 100)
 
-            h5_element = await page.query_selector('h5.l5')
-            question_content = await h5_element.inner_text()
+        for _ in range(1, 15):
+            await page.evaluate(f'window.scrollBy(0, {random_scroll_position})')
+            time.sleep(0.25)
 
-            print("Div Content:", div_content)
-            print("Question Content:", question_content)
-            return [div_content]
-        except Exception as ex:
-            print(ex)
-            return []
+        await page.evaluate(f'window.scrollTo(0, {scroll_position})')
 
+    @staticmethod
+    async def simulate_mouse_movements(page: Page):
+        # Calculate the center point of the viewport
+        viewport_center_x = 1280 // 2
+        viewport_center_y = 720 // 2
 
-async def simulate_mouse_movements(page):
-    # Calculate the center point of the viewport
-    viewport_center_x = 1280 // 2
-    viewport_center_y = 720 // 2
+        # Define the maximum distance to move the mouse from the center
+        max_distance = 50
 
-    # Define the maximum distance to move the mouse from the center
-    max_distance = 50
+        # Simulate mouse movements
+        for _ in range(5):  # Perform 5 movements
+            offset_x = random.randint(-max_distance, max_distance)
+            offset_y = random.randint(-max_distance, max_distance)
 
-    # Simulate mouse movements
-    for _ in range(5):  # Perform 5 movements
-        # Calculate random offset values for the mouse movement
-        offset_x = random.randint(-max_distance, max_distance)
-        offset_y = random.randint(-max_distance, max_distance)
+            target_x = viewport_center_x + offset_x
+            target_y = viewport_center_y + offset_y
 
-        # Calculate the target position based on the offset
-        target_x = viewport_center_x + offset_x
-        target_y = viewport_center_y + offset_y
-
-        # Simulate mouse movement to the target position
-        await page.mouse.move(target_x, target_y)
-
-        # Wait for a random duration before the next movement
-        await page.wait_for_timeout(random.randint(500, 1500))  # Wait for 0.5 to 1.5 seconds
+            await page.mouse.move(target_x, target_y)
+            await page.wait_for_timeout(random.randint(500, 1500))
 
 
 class G2CrowdScraper(ScraperBase):
@@ -129,8 +119,8 @@ class G2CrowdScraper(ScraperBase):
             context = await browser.new_context(
                 user_agent=user_agent,
                 java_script_enabled=True,
-                bypass_csp=True,  # Bypass content security policy
-                ignore_https_errors=True  # Ignore HTTPS errors
+                bypass_csp=True,
+                ignore_https_errors=True
             )
             page = await context.new_page()
 
@@ -148,7 +138,7 @@ class G2CrowdScraper(ScraperBase):
 
             input_field = await page.query_selector('input[name="query"]')
             await input_field.fill(url)
-            await simulate_mouse_movements(page)
+            await self.simulate_mouse_movements(page)
             time.sleep(1.2)
             await page.keyboard.press('Enter')
 
@@ -164,10 +154,10 @@ class G2CrowdScraper(ScraperBase):
                 await browser.close()
                 return Exception(f"Product title not found for url: {url}")
 
-            await simulate_mouse_movements(page)
+            await self.simulate_mouse_movements(page)
 
-            # Enable popup events
-            context.on("page", lambda new_page: self.handle_new_page(new_page))
+            # Enable popup events (Callbacks for new pages)
+            context.on("page", lambda new_pg: self.handle_new_page(new_pg))
 
             # Click on the product title
             await page.click('div.product-listing__title.mb-1 a', force=True, button='middle')
@@ -181,7 +171,6 @@ class G2CrowdScraper(ScraperBase):
             description = await self.scrape_description(new_page)
             rating = await self.scrape_rating(new_page)
             percentage_of_all_star_reviews = await self.scrape_percentage_of_all_star_reviews(new_page)
-            reviews = await self.scrape_obtain_reviews(new_page)
 
             await browser.close()
 
@@ -208,14 +197,3 @@ class G2CrowdScraper(ScraperBase):
 
         delattr(self, 'new_page')
         return new_page
-
-    @staticmethod
-    async def scroll_page_randomly(page):
-        scroll_position = await page.evaluate('window.pageYOffset')
-        random_scroll_position = random.randint(0, 100)
-
-        for i in range(1, 15):
-            await page.evaluate(f'window.scrollBy(0, {random_scroll_position})')
-            time.sleep(0.25)
-
-        await page.evaluate(f'window.scrollTo(0, {scroll_position})')
